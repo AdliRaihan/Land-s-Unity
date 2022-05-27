@@ -41,22 +41,6 @@ public class Movement : MovementDelegates
         else this.decreaseMovementSpeed();
         this.internalUpdateMovement(transform);
     }
-    public void setObject(Transform source, Vector3 target)
-    {
-        source.position = target / magnetSpeed;
-        if (this.magnetSpeed > 1f && this.magnetSpeed - velocity > 1) this.magnetSpeed -= velocity;
-        else this.magnetSpeed = 1f;
-        this.velocity += 0.0025f;
-    }
-    public void restoreSpeed() {
-        this.magnetSpeed = 10f;
-        this.velocity = 0.01f;
-    }
-    public float getObjectSpeed()
-    {
-        return this.currentSpeed;
-    }
-
     private void internalUpdateMovement(Transform transform)
     {
         switch (this.currentDirection)
@@ -92,6 +76,50 @@ public class Movement : MovementDelegates
             case MovementDirection.STAY:
                 break;
         }
+    }
+    public void setObject(Transform source, Vector3 target)
+    {
+        float x = source.position.x;
+        float y = source.position.y;
+        float z = source.position.z;
+
+        float x2 = target.x;
+        float y2 = target.y;
+        float z2 = target.z;
+
+        float xDiff = x2 - x;
+        float yDiff = y2 - y;
+
+        float xDiffAbs = Mathf.Abs(xDiff);
+        float yDiffAbs = Mathf.Abs(yDiff);
+
+        float x3 = 0, y3 = 0, z3 = 0;
+
+        if (xDiffAbs > yDiffAbs)
+        {
+            x3 = xDiff > 0 ? x + this.velocity : x - this.velocity;
+            y3 = y;
+        }
+        else
+        {
+            x3 = x;
+            y3 = yDiff > 0 ? y + this.velocity : y - this.velocity;
+        }
+
+        source.position = new Vector3(x3, y3, z2);
+
+        if (this.magnetSpeed > 1f && this.magnetSpeed - velocity > 1) this.magnetSpeed -= velocity;
+        else this.magnetSpeed = 1f;
+        this.velocity += 0.0025f;
+    }
+    public void restoreSpeed()
+    {
+        this.magnetSpeed = 10f;
+        this.velocity = 0.01f;
+    }
+    public float getObjectSpeed()
+    {
+        return this.currentSpeed;
     }
 
     private void moveObjectTo(Transform transform, Vector3 to, bool dualMovement = false)
